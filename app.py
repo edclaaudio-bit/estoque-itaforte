@@ -28,7 +28,7 @@ st.markdown("""
     </style>
     <div class="mega-header">
         <h1 style="margin:0; font-weight:800;">ITAFORTE - High Performance Materials</h1>
-        <p style="margin:0; opacity:0.7;">Smart Inventory Cloud 2026</p>
+        <p style="margin:0; opacity:0.7;">Smart Inventory Cloud </p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -51,7 +51,7 @@ try:
                 q = st.number_input("Quantidade", min_value=0.0, step=0.01)
                 obs = st.text_input("Observação")
                 
-                if st.form_submit_button("REGISTRAR NA NUVEM"):
+                if st.form_submit_button("REGISTRAR"):
                     if p and q > 0:
                         # PEGA A HORA EXATA DE BRASÍLIA
                         agora_br = datetime.now(fuso_br).strftime("%d/%m/%Y %H:%M")
@@ -111,5 +111,6 @@ try:
 except Exception as e:
     st.error("Erro ao conectar com a planilha.")
     st.write(e)
+
 
 
