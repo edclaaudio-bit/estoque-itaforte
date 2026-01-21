@@ -76,7 +76,7 @@ try:
                     st.rerun()
 
     with col_dir:
-        st.subheader("📊 Dashboard de Estoque")
+        st.subheader("📈 Dashboard de Estoque")
         prod_selecionado = st.selectbox("Selecione um produto para análise:", options=["Ver Todos"] + lista_prods)
         
         col_m1, col_m2, col_m3 = st.columns(3)
@@ -111,3 +111,4 @@ try:
 except Exception as e:
     st.error("Erro ao conectar com a planilha.")
     st.write(e)
+
