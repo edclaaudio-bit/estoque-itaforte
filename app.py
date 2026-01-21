@@ -7,7 +7,6 @@ from streamlit_gsheets import GSheetsConnection
 st.set_page_config(page_title="ITAFORTE | Smart Inventory", layout="wide")
 
 # 2. CONEXÃO COM GOOGLE SHEETS
-# O link que você forneceu: https://docs.google.com/spreadsheets/d/1LQPeIhv2OoM_k0fPQEf03gi3TRqZUeGPR1fyx3qUL3I/edit?usp=sharing
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def carregar_dados():
@@ -19,12 +18,11 @@ st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
         .stExpander details summary p { font-size: 1.1rem !important; font-weight: 700 !important; margin: 0 !important; }
-        .stExpander details summary svg { display: none !important; }
         :root { --cor-texto: #0f172a; }
         @media (prefers-color-scheme: dark) { :root { --cor-texto: #ffffff; } }
-        .stExpander details summary p { color: var(--cor-texto) !important; }
         .mega-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 30px; border-radius: 15px; margin-bottom: 25px; border-left: 10px solid #3b82f6; color: white; }
         .stButton>button { width: 100%; border-radius: 8px; font-weight: 600; background-color: #3b82f6 !important; color: white !important; }
+        .metric-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; border: 1px solid rgba(128,128,128,0.2); }
     </style>
     <div class="mega-header">
         <h1 style="margin:0; font-weight:800;">ITAFORTE</h1>
@@ -35,10 +33,9 @@ st.markdown("""
 # 3. INTERFACE E LÓGICA
 try:
     df_mov = carregar_dados()
-    # Remove linhas vazias se houver
     df_mov = df_mov.dropna(how='all')
     
-    # Lista de produtos únicos baseada no que já foi cadastrado
+    # Lista de produtos únicos
     lista_prods = sorted(df_mov['Produto'].unique().tolist()) if not df_mov.empty else []
 
     col_esq, col_dir = st.columns([1, 2.3], gap="large")
@@ -72,9 +69,47 @@ try:
                     st.rerun()
 
     with col_dir:
-        st.subheader("🕒 Fluxo em Tempo Real")
+        # --- SEÇÃO DO DASHBOARD ---
+        st.subheader("📊 Dashboard de Estoque")
+        
+        prod_selecionado = st.selectbox("Selecione um produto para análise:", options=["Ver Todos"] + lista_prods)
+        
+        col_m1, col_m2, col_m3 = st.columns(3)
+        
         if not df_mov.empty:
-            st.dataframe(df_mov.sort_index(ascending=False), use_container_width=True, hide_index=True)
+            if prod_selecionado != "Ver Todos":
+                # Filtra dados do produto específico
+                df_prod = df_mov[df_mov['Produto'] == prod_selecionado]
+                entradas = df_prod[df_prod['Tipo'] == 'Entrada']['Quantidade'].sum()
+                saidas = df_prod[df_prod['Tipo'] == 'Saída']['Quantidade'].sum()
+                estoque_atual = entradas - saidas
+                
+                with col_m1:
+                    st.metric("Entradas", f"{entradas:,.2f}")
+                with col_m2:
+                    st.metric("Saídas", f"{saidas:,.2f}")
+                with col_m3:
+                    cor_estoque = "normal" if estoque_atual >= 0 else "inverse"
+                    st.metric("Estoque Atual", f"{estoque_atual:,.2f}", delta=None)
+            else:
+                # Resumo Geral
+                total_entradas = df_mov[df_mov['Tipo'] == 'Entrada']['Quantidade'].sum()
+                total_saidas = df_mov[df_mov['Tipo'] == 'Saída']['Quantidade'].sum()
+                with col_m1: st.metric("Total Entradas", f"{total_entradas:,.2f}")
+                with col_m2: st.metric("Total Saídas", f"{total_saidas:,.2f}")
+                with col_m3: st.metric("Itens Cadastrados", len(lista_prods))
+
+        st.divider()
+        
+        # --- TABELA DE MOVIMENTAÇÃO ---
+        st.subheader("🕒 Fluxo de Movimentação")
+        if not df_mov.empty:
+            # Se um produto estiver selecionado, filtra a tabela também
+            df_display = df_mov.copy()
+            if prod_selecionado != "Ver Todos":
+                df_display = df_display[df_display['Produto'] == prod_selecionado]
+            
+            st.dataframe(df_display.sort_index(ascending=False), use_container_width=True, hide_index=True)
         else:
             st.info("Aguardando o primeiro lançamento...")
 
