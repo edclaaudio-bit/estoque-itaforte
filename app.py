@@ -7,7 +7,7 @@ from streamlit_gsheets import GSheetsConnection
 # --- 1. CONFIGURAÇÃO E SEGURANÇA ---
 st.set_page_config(page_title="ITAFORTE | Inventory", layout="wide")
 
-# Defina sua senha aqui
+# Senha atualizada conforme solicitado
 SENHA_CORRETA = "itaforte@2026"
 
 def verificar_senha():
@@ -16,7 +16,8 @@ def verificar_senha():
         st.session_state["autenticado"] = False
 
     if not st.session_state["autenticado"]:
-        col1, col2, col3 = st.columns([1, 1, 1])
+        # Centralizando o formulário de login
+        _, col2, _ = st.columns([1, 1, 1])
         with col2:
             st.markdown("### 🔒 Acesso Restrito")
             senha_digitada = st.text_input("Digite a senha para acessar o sistema:", type="password")
@@ -29,27 +30,23 @@ def verificar_senha():
         return False
     return True
 
-# Só executa o app se estiver autenticado
+# O app só roda se o login for bem-sucedido
 if verificar_senha():
-    # --- 2. CONFIGURAÇÕES INICIAIS ---
+    # --- 2. CONFIGURAÇÕES DO APP ---
     fuso_br = pytz.timezone('America/Sao_Paulo')
     conn = st.connection("gsheets", type=GSheetsConnection)
 
     def carregar_dados():
         return conn.read(ttl="0") 
 
-    # Botão de Logout no topo da barra lateral
-    if st.sidebar.button("Sair / Logoff"):
-        st.session_state["autenticado"] = False
-        st.rerun()
+    # Botão de Logout na barra lateral
+    st.sidebar.button("Sair / Logoff", on_click=lambda: st.session_state.update({"autenticado": False}))
 
     # --- CSS PROFISSIONAL ---
     st.markdown("""
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
             .stExpander details summary p { font-size: 1.1rem !important; font-weight: 700 !important; margin: 0 !important; }
-            :root { --cor-texto: #0f172a; }
-            @media (prefers-color-scheme: dark) { :root { --cor-texto: #ffffff; } }
             .mega-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 30px; border-radius: 15px; margin-bottom: 25px; border-left: 10px solid #3b82f6; color: white; }
             .stButton>button { width: 100%; border-radius: 8px; font-weight: 600; background-color: #3b82f6 !important; color: white !important; }
         </style>
@@ -59,7 +56,7 @@ if verificar_senha():
         </div>
     """, unsafe_allow_html=True)
 
-    # --- 3. INTERFACE E LÓGICA ---
+    # --- 3. LÓGICA DE DADOS ---
     try:
         df_mov = carregar_dados()
         df_mov = df_mov.dropna(how='all')
@@ -134,4 +131,3 @@ if verificar_senha():
     except Exception as e:
         st.error("Erro ao conectar com a planilha.")
         st.write(e)
-
