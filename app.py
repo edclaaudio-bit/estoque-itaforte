@@ -8,7 +8,7 @@ from streamlit_gsheets import GSheetsConnection
 st.set_page_config(page_title="ITAFORTE | Inventory", layout="wide")
 
 # Defina sua senha aqui
-SENHA_CORRETA = "suasenha123"
+SENHA_CORRETA = "itaforte@2026"
 
 def verificar_senha():
     """Retorna True se o usuário inseriu a senha correta."""
@@ -134,3 +134,4 @@ if verificar_senha():
     except Exception as e:
         st.error("Erro ao conectar com a planilha.")
         st.write(e)
+
