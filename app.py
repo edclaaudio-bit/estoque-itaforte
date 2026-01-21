@@ -5,7 +5,7 @@ import pytz # Importante para o fuso horário
 from streamlit_gsheets import GSheetsConnection
 
 # 1. CONFIGURAÇÃO DA PÁGINA
-st.set_page_config(page_title="ITAFORTE | Smart Inventory", layout="wide")
+st.set_page_config(page_title="ITAFORTE | Inventory", layout="wide")
 
 # Configuração do Fuso Horário de Brasília
 fuso_br = pytz.timezone('America/Sao_Paulo')
@@ -111,6 +111,7 @@ try:
 except Exception as e:
     st.error("Erro ao conectar com a planilha.")
     st.write(e)
+
 
 
 
