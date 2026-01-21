@@ -27,7 +27,7 @@ st.markdown("""
         .stButton>button { width: 100%; border-radius: 8px; font-weight: 600; background-color: #3b82f6 !important; color: white !important; }
     </style>
     <div class="mega-header">
-        <h1 style="margin:0; font-weight:800;">ITAFORTE</h1>
+        <h1 style="margin:0; font-weight:800;">ITAFORTE - High Performance Materials</h1>
         <p style="margin:0; opacity:0.7;">Smart Inventory Cloud 2026</p>
     </div>
 """, unsafe_allow_html=True)
@@ -111,4 +111,5 @@ try:
 except Exception as e:
     st.error("Erro ao conectar com a planilha.")
     st.write(e)
+
 
